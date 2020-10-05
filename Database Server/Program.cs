@@ -11,7 +11,8 @@ using System.Collections.Generic;
 using System.Text;
 using System.Net;
 using System.Net.Sockets;
-
+using System.IO;
+using System.Linq;
 
 namespace MultiServer
 {
@@ -22,6 +23,9 @@ namespace MultiServer
         private const int PORT = 12345;
         private const int BUFFER_SIZE = 1024;
         private static readonly byte[] buffer = new byte[BUFFER_SIZE];
+
+        public static int counter;
+        public static int lineNumber;
 
         static void Main()
         {
@@ -126,20 +130,45 @@ namespace MultiServer
             Console.WriteLine("Received Text: " + commandLine);
             string[] commands = new string[5];
             commands = commandLine.Split(' ');
+            string filePath = @"C:\Users\Acer\Desktop\data.txt";
 
             switch (commands[0].ToLower())
             {
                 case "insert":
+                    
+                    List<string> lines = new List<string>();
+                    lines = File.ReadAllLines(filePath).ToList();
+                    lines.Add(commands[1] + " " + commands[2] + " " + commands[3]);
+                    File.WriteAllLines(filePath, lines);
                     Console.WriteLine("Insert command received");
                     response = Encoding.ASCII.GetBytes("Insert successful.");
                     currentSocket.Send(response);
                     break;
                 case "update":
+                    
+                    lineChanger(commands[1] + " " + commands[2] + " " + commands[3], @"C:\Users\Acer\Desktop\data.txt", Program.lineNumber + 1);
                     Console.WriteLine("Update command received");
                     response = Encoding.ASCII.GetBytes("Update successful.");
                     currentSocket.Send(response);
                     break;
                 case "find":
+                    StreamReader sr = new StreamReader(@"C:\Users\Acer\Desktop\data.txt");
+                    string line = sr.ReadLine();
+                    while (line != null)
+                    {
+                        if (line.Contains(commands[1]))
+                        {
+                            Program.lineNumber = Program.counter;
+                            Program.counter = 0;
+                            Console.WriteLine(line);
+                            response = Encoding.ASCII.GetBytes(line);
+                            currentSocket.Send(response);
+                            break;
+                        }
+                        line = sr.ReadLine();
+                        Program.counter++;
+                    }
+                    sr.Close();
                     Console.WriteLine("Find command received");
                     response = Encoding.ASCII.GetBytes("Find successful.");
                     currentSocket.Send(response);
@@ -158,6 +187,8 @@ namespace MultiServer
                     break;
             }
 
+           
+
             try
             {
                 currentSocket.BeginReceive(buffer, 0, BUFFER_SIZE, SocketFlags.None, ReceiveCallback, currentSocket);
@@ -167,6 +198,12 @@ namespace MultiServer
                 // I don't really know WHY this happens, but when I quit from the client it throws an exception.
             }
 
+        }
+        static void lineChanger(string newText, string fileName, int line_to_edit)
+        {
+            string[] arrLine = File.ReadAllLines(fileName);
+            arrLine[line_to_edit - 1] = newText;
+            File.WriteAllLines(fileName, arrLine);
         }
     }
 }
