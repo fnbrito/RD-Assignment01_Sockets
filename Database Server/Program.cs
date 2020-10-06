@@ -132,9 +132,18 @@ namespace Database_Server
             Console.WriteLine("Received Text: " + commandLine);
             string[] commands = new string[5];
             commands = commandLine.Split(' ');
-            string filePath = @"C:\Users\Filipe\Documents\data.txt";
+            string filePath = @"..\..\\database.txt";
+            //Console.WriteLine(File.Exists(filePath) ? "File exists." :  StreamWriter creat = File.CreateText(filePath);
+            if (File.Exists(filePath))
+            {
 
-            StreamReader cou = new StreamReader(@"C:\Users\Filipe\Documents\data.txt");
+            }
+            else
+            {
+                StreamWriter creat = File.CreateText(filePath);
+            }
+
+            StreamReader cou = new StreamReader(filePath);
             string line2 = cou.ReadLine();
             Program.idNumber = 0;
             while (line2 != null)
@@ -166,14 +175,14 @@ namespace Database_Server
                     break;
                 case "update":
                     
-                    lineChanger(Program.lineNumber + "," +commands[1] + "," + commands[2] + "," + commands[3], @"C:\Users\Filipe\Documents\data.txt", Program.lineNumber + 1);
+                    lineChanger(Program.lineNumber + "," +commands[1] + "," + commands[2] + "," + commands[3], filePath, Program.lineNumber + 1);
                     
                     Console.WriteLine("Update command received");
                     response = Encoding.ASCII.GetBytes("\nUpdate successful.");
                     currentSocket.Send(response);
                     break;
                 case "find":
-                    StreamReader sr = new StreamReader(@"C:\Users\Filipe\Documents\data.txt");
+                    StreamReader sr = new StreamReader(filePath);
                     string line = sr.ReadLine();
                     while (line != null)
                     {
@@ -182,17 +191,27 @@ namespace Database_Server
                             Program.lineNumber = Program.counter;
                             Program.counter = 0;
                             Console.WriteLine(line);
+                            if (line == null)
+                            {
+                                response = Encoding.ASCII.GetBytes("No Records Found For Id" + commands[1]);
+                                currentSocket.Send(response);
+                                break;
+                            }
                             response = Encoding.ASCII.GetBytes(line);
                             currentSocket.Send(response);
                             break;
+                        }else
+                        {
+                            response = Encoding.ASCII.GetBytes("No Records Found For Id" + commands[1]);
+                            currentSocket.Send(response);
                         }
                         line = sr.ReadLine();
                         Program.counter++;
                     }
+
                     sr.Close();
                     Console.WriteLine("Find command received");
-                    //response = Encoding.ASCII.GetBytes("\nFind successful.");
-                    //currentSocket.Send(response);
+                    
                     break;
                 case "quit":
                     currentSocket.Shutdown(SocketShutdown.Both);
