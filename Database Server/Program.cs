@@ -175,8 +175,9 @@ namespace Database_Server
                     break;
                 case "update":
                     
-                    lineChanger(Program.lineNumber + "," +commands[1] + "," + commands[2] + "," + commands[3], filePath, Program.lineNumber + 1);
-                    
+                    //lineChanger(Program.lineNumber + "," +commands[1] + "," + commands[2] + "," + commands[3], filePath, Program.lineNumber + 1);
+                    lineChanger(commands[1] + "," + commands[2] + "," + commands[3] + "," + commands[4], filePath, Program.lineNumber + 1);
+
                     Console.WriteLine("Update command received");
                     response = Encoding.ASCII.GetBytes("\nUpdate successful.");
                     currentSocket.Send(response);
@@ -191,22 +192,19 @@ namespace Database_Server
                             Program.lineNumber = Program.counter;
                             Program.counter = 0;
                             Console.WriteLine(line);
-                            if (line == null)
-                            {
-                                response = Encoding.ASCII.GetBytes("No Records Found For Id" + commands[1]);
-                                currentSocket.Send(response);
-                                break;
-                            }
+                            
                             response = Encoding.ASCII.GetBytes(line);
                             currentSocket.Send(response);
                             break;
-                        }else
-                        {
-                            response = Encoding.ASCII.GetBytes("No Records Found For Id" + commands[1]);
-                            currentSocket.Send(response);
                         }
                         line = sr.ReadLine();
                         Program.counter++;
+                        if (line == null)
+                        {
+                            response = Encoding.ASCII.GetBytes("No Records Found For Id: " + commands[1]);
+                            currentSocket.Send(response);
+                            break;
+                        }
                     }
 
                     sr.Close();
