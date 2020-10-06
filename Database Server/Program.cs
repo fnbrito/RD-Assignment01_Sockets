@@ -9,6 +9,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Net;
 using System.Net.Sockets;
 using System.IO;
@@ -131,9 +132,9 @@ namespace MultiServer
             Console.WriteLine("Received Text: " + commandLine);
             string[] commands = new string[5];
             commands = commandLine.Split(' ');
-            string filePath = @"C:\Users\Acer\Desktop\data.txt";
+            string filePath = @"C:\Users\Filipe\Documents\data.txt";
 
-            StreamReader cou = new StreamReader(@"C:\Users\Acer\Desktop\data.txt");
+            StreamReader cou = new StreamReader(@"C:\Users\Filipe\Documents\data.txt");
             string line2 = cou.ReadLine();
             Program.idNumber = 0;
             while (line2 != null)
@@ -147,10 +148,16 @@ namespace MultiServer
             switch (commands[0].ToLower())
             {
                 case "insert":
-                    
+                    if (!Regex.IsMatch(commands[3], "(0[1-9]|[12][0-9]|3[01])/(0[1-9]|1[012])/((19|20)[\\d]{2})"))
+                    {
+                        Console.WriteLine("Invalid date format.");
+                        response = Encoding.ASCII.GetBytes("Please check your date format. Type the query again.\nPlease try again.");
+                        currentSocket.Send(response);
+                        break;
+                    }
                     List<string> lines = new List<string>();
                     lines = File.ReadAllLines(filePath).ToList();
-                    lines.Add("000"+Program.idNumber + "," + commands[1] + "," + commands[2] + "," + commands[3]);
+                    lines.Add(Program.idNumber + "," + commands[1] + "," + commands[2] + "," + commands[3]);
                     Program.idNumber++;
                     File.WriteAllLines(filePath, lines);
                     Console.WriteLine("Insert command received");
@@ -159,18 +166,18 @@ namespace MultiServer
                     break;
                 case "update":
                     
-                    lineChanger("000"+Program.lineNumber + "," +commands[1] + "," + commands[2] + "," + commands[3], @"C:\Users\Acer\Desktop\data.txt", Program.lineNumber + 1);
+                    lineChanger(Program.lineNumber + "," +commands[1] + "," + commands[2] + "," + commands[3], @"C:\Users\Filipe\Documents\data.txt", Program.lineNumber + 1);
                     
                     Console.WriteLine("Update command received");
                     response = Encoding.ASCII.GetBytes("\nUpdate successful.");
                     currentSocket.Send(response);
                     break;
                 case "find":
-                    StreamReader sr = new StreamReader(@"C:\Users\Acer\Desktop\data.txt");
+                    StreamReader sr = new StreamReader(@"C:\Users\Filipe\Documents\data.txt");
                     string line = sr.ReadLine();
                     while (line != null)
                     {
-                        if (line.Contains(commands[1]))
+                        if (line.Contains(commands[1] + ','))
                         {
                             Program.lineNumber = Program.counter;
                             Program.counter = 0;
@@ -192,6 +199,13 @@ namespace MultiServer
                     currentSocket.Close();
                     clientSideSockets.Remove(currentSocket);
                     Console.WriteLine("Client requested to disconnect.");
+                    break;
+                case "help":
+                    response = Encoding.ASCII.GetBytes("Write your command (insert, update or find) followed by first name, last name and date of birth (DD/MM/YYYY).\n" +
+                                                        "Please separate each operation with a single space. Type 'quit' to quit the program.\n" +
+                                                        "E.g.: To insert an entry:\"insert John Doe 22/01/1956\"\n" +
+                                                        "to update an entry insert the ID before the name: \"update 34 John Doe 22/01/1966\"");
+                    currentSocket.Send(response);
                     break;
                 default:
                     Console.WriteLine("Received an invalid request");

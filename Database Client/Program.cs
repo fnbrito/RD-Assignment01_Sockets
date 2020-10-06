@@ -52,10 +52,10 @@ namespace MultiClient
 
         private static void MainLoop()
         {
-            Console.WriteLine(@"Write your command (insert, update or find) followed by first name, last name and date of birth (YYYY/MM/DD).\n" +
+            Console.WriteLine(@"Write your command (insert, update or find) followed by first name, last name and date of birth (DD/MM/YYYY).\n" +
                 "Please separate each operation with a single space. Type 'quit' to quit the program.\n" +
-                "E.g.: To insert an entry:\"insert John Doe 1956/01/22\"\n" +
-                "to update an entry insert the ID before the name: \"update 34 John Doe 1966/01/22\"");
+                "E.g.: To insert an entry:\"insert John Doe 22/01/1956\"\n" +
+                "to update an entry insert the ID before the name: \"update 34 John Doe 22/01/1966\"");
 
             while (true)
             {
@@ -80,10 +80,17 @@ namespace MultiClient
 
         private static void SendRequest()
         {
+            string request = "";
+            while (request == "")
+            {
+                Console.WriteLine("Please type in your command. If you want help, type \"help\".");
+                request = Console.ReadLine();
+            }
+            string[] commands = new string[5];
+            commands = request.Split(' ');
             Console.Write("Send a request: ");
-            string request = Console.ReadLine();
-            SendString(request);
 
+            SendString(request);
             if (request.ToLower() == "quit")
             {
                 Quit();
