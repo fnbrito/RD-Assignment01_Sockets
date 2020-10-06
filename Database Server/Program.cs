@@ -173,19 +173,17 @@ namespace Database_Server
                 case "update":
                     Console.WriteLine("Update command received");
 
-                    if (!DateValidation(commandPiece[4]))
-                    {
-                        Console.WriteLine("Invalid date format.");
-                        response = Encoding.ASCII.GetBytes("Please check your date format. Type the query again.");
-                        currentSocket.Send(response);
-                        break;
-                    }
-
-
                     if (commandPiece.Count() < 5)
                     {
                         Console.WriteLine("Not enough arguments provided.");
                         response = Encoding.ASCII.GetBytes("Please check your command. Type the query again.");
+                        currentSocket.Send(response);
+                        break;
+                    }
+                    if (!DateValidation(commandPiece[4]))
+                    {
+                        Console.WriteLine("Invalid date format.");
+                        response = Encoding.ASCII.GetBytes("Please check your date format. Type the query again.");
                         currentSocket.Send(response);
                         break;
                     }
@@ -211,7 +209,6 @@ namespace Database_Server
 
                 case "find":
                     Console.WriteLine("Find command received");
-                    lineID = Int32.Parse(commandPiece[1]);
 
                     if (commandPiece.Count() < 2)
                     {
@@ -220,6 +217,8 @@ namespace Database_Server
                         currentSocket.Send(response);
                         break;
                     }
+
+                    lineID = Int32.Parse(commandPiece[1]);
 
                     try
                     {
