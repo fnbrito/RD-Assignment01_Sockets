@@ -150,7 +150,7 @@ namespace MultiServer
                     
                     List<string> lines = new List<string>();
                     lines = File.ReadAllLines(filePath).ToList();
-                    lines.Add(Program.idNumber + "," + commands[1] + "," + commands[2] + "," + commands[3]);
+                    lines.Add("000"+Program.idNumber + "," + commands[1] + "," + commands[2] + "," + commands[3]);
                     Program.idNumber++;
                     File.WriteAllLines(filePath, lines);
                     Console.WriteLine("Insert command received");
@@ -159,7 +159,7 @@ namespace MultiServer
                     break;
                 case "update":
                     
-                    lineChanger(Program.lineNumber + "," +commands[1] + "," + commands[2] + "," + commands[3], @"C:\Users\Acer\Desktop\data.txt", Program.lineNumber + 1);
+                    lineChanger("000"+Program.lineNumber + "," +commands[1] + "," + commands[2] + "," + commands[3], @"C:\Users\Acer\Desktop\data.txt", Program.lineNumber + 1);
                     
                     Console.WriteLine("Update command received");
                     response = Encoding.ASCII.GetBytes("\nUpdate successful.");
@@ -184,7 +184,7 @@ namespace MultiServer
                     }
                     sr.Close();
                     Console.WriteLine("Find command received");
-                    response = Encoding.ASCII.GetBytes("\nFind successful.");
+                    //response = Encoding.ASCII.GetBytes("\nFind successful.");
                     //currentSocket.Send(response);
                     break;
                 case "quit":
