@@ -125,7 +125,7 @@ namespace Database_Server
             commandPiece = commandLine.Split(' ');          // splits the command sent into the array[]
 
 
-            string filePath = @"..\..\database.txt";            // creates the file path for the fileIO to work with
+            string filePath = @"database.txt";            // creates the file path for the fileIO to work with
             List<string> lineList = new List<string>();         // this will store all lines of the text file
 
             try
