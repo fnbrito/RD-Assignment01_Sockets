@@ -25,6 +25,8 @@ using System.Net.Sockets;
 using System.IO;
 using System.Linq;
 using System.Runtime.Remoting.Messaging;
+using System.ComponentModel.Design;
+using System.Threading;
 
 namespace Database_Server
 {
@@ -119,7 +121,7 @@ namespace Database_Server
             string commandLine = Encoding.ASCII.GetString(receivedBuffer);  // converts the bytes received to characters
             Console.WriteLine("Received Text: " + commandLine);             // shows what was received
 
-            string[] commandPiece = new string[4];          // creates an array of strings to store the command divided
+            string[] commandPiece = new string[5];          // creates an array of strings to store the command divided
             commandPiece = commandLine.Split(' ');          // splits the command sent into the array[]
 
 
@@ -143,23 +145,29 @@ namespace Database_Server
                 case "insert":
                     Console.WriteLine("Insert command received");
 
-                    if (!DateValidation(commandPiece[3]))       // in case the date is not valid, sends the response to the 
+                    if (commandPiece.Count() < 4)
+                    {
+                        Console.WriteLine("Not enough arguments provided.");
+                        response = Encoding.ASCII.GetBytes("Please check your command. Type the query again.");
+                        currentSocket.Send(response);
+                        break;
+                    }
+                    if (!DateValidation(commandPiece[3]))       // in case the date is not valid, sends the response to the client 
                     {
                         Console.WriteLine("Invalid date format.");
-                        response = Encoding.ASCII.GetBytes("Please check your date format. Type the query again.\nPlease try again.");
+                        response = Encoding.ASCII.GetBytes("Please check your date format. Type the query again.");
                         currentSocket.Send(response);
                     }
 
-                    foreach (string element in lineList)
+                    foreach (string element in lineList) // goes through the whole local list and increments the counter to get the ID it's at
                     {
                         lineNumber++;
                     }
-                    lineNumber--;
-                    lineList.Add(++lineNumber + "," + commandPiece[1] + "," + commandPiece[2] + "," + commandPiece[3]);
-                    File.WriteAllLines(filePath, lineList);
+                    lineList.Add(lineNumber + "," + commandPiece[1] + "," + commandPiece[2] + "," + commandPiece[3]);   // adds the line to the end of the list
+                    File.WriteAllLines(filePath, lineList);                                                             // writes to the txt file
 
-                    response = Encoding.ASCII.GetBytes(commandPiece[1] + " " + commandPiece[2] + " was added to the database.");
-                    currentSocket.Send(response);
+                    response = Encoding.ASCII.GetBytes(commandPiece[1] + " " + commandPiece[2] + " was added to the database.");    // constructs response object
+                    currentSocket.Send(response);                                                                                   // sends it
                     break;
 
                 case "update":
@@ -168,8 +176,18 @@ namespace Database_Server
                     if (!DateValidation(commandPiece[4]))
                     {
                         Console.WriteLine("Invalid date format.");
-                        response = Encoding.ASCII.GetBytes("Please check your date format. Type the query again.\nPlease try again.");
+                        response = Encoding.ASCII.GetBytes("Please check your date format. Type the query again.");
                         currentSocket.Send(response);
+                        break;
+                    }
+
+
+                    if (commandPiece.Count() < 5)
+                    {
+                        Console.WriteLine("Not enough arguments provided.");
+                        response = Encoding.ASCII.GetBytes("Please check your command. Type the query again.");
+                        currentSocket.Send(response);
+                        break;
                     }
 
                     int lineID = Int32.Parse(commandPiece[1]);
@@ -194,6 +212,14 @@ namespace Database_Server
                 case "find":
                     Console.WriteLine("Find command received");
                     lineID = Int32.Parse(commandPiece[1]);
+
+                    if (commandPiece.Count() < 2)
+                    {
+                        Console.WriteLine("Not enough arguments provided.");
+                        response = Encoding.ASCII.GetBytes("Please check your command. Type the query again.");
+                        currentSocket.Send(response);
+                        break;
+                    }
 
                     try
                     {
