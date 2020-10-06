@@ -25,6 +25,7 @@ namespace MultiServer
         private static readonly byte[] buffer = new byte[BUFFER_SIZE];
 
         public static int counter;
+        public static int idNumber;
         public static int lineNumber;
 
         static void Main()
@@ -132,23 +133,36 @@ namespace MultiServer
             commands = commandLine.Split(' ');
             string filePath = @"C:\Users\Acer\Desktop\data.txt";
 
+            StreamReader cou = new StreamReader(@"C:\Users\Acer\Desktop\data.txt");
+            string line2 = cou.ReadLine();
+            Program.idNumber = 0;
+            while (line2 != null)
+            {
+               
+                line2 = cou.ReadLine();
+                Program.idNumber++;
+            }
+            cou.Close();
+
             switch (commands[0].ToLower())
             {
                 case "insert":
                     
                     List<string> lines = new List<string>();
                     lines = File.ReadAllLines(filePath).ToList();
-                    lines.Add(commands[1] + " " + commands[2] + " " + commands[3]);
+                    lines.Add(Program.idNumber + "," + commands[1] + "," + commands[2] + "," + commands[3]);
+                    Program.idNumber++;
                     File.WriteAllLines(filePath, lines);
                     Console.WriteLine("Insert command received");
-                    response = Encoding.ASCII.GetBytes("Insert successful.");
+                    response = Encoding.ASCII.GetBytes("\nInsert successful.");
                     currentSocket.Send(response);
                     break;
                 case "update":
                     
-                    lineChanger(commands[1] + " " + commands[2] + " " + commands[3], @"C:\Users\Acer\Desktop\data.txt", Program.lineNumber + 1);
+                    lineChanger(Program.lineNumber + "," +commands[1] + "," + commands[2] + "," + commands[3], @"C:\Users\Acer\Desktop\data.txt", Program.lineNumber + 1);
+                    
                     Console.WriteLine("Update command received");
-                    response = Encoding.ASCII.GetBytes("Update successful.");
+                    response = Encoding.ASCII.GetBytes("\nUpdate successful.");
                     currentSocket.Send(response);
                     break;
                 case "find":
@@ -170,8 +184,8 @@ namespace MultiServer
                     }
                     sr.Close();
                     Console.WriteLine("Find command received");
-                    response = Encoding.ASCII.GetBytes("Find successful.");
-                    currentSocket.Send(response);
+                    response = Encoding.ASCII.GetBytes("\nFind successful.");
+                    //currentSocket.Send(response);
                     break;
                 case "quit":
                     currentSocket.Shutdown(SocketShutdown.Both);
