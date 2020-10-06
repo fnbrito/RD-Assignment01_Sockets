@@ -15,6 +15,16 @@
     *                       The user may type 'help' if they need to be remined of commands.
     *                       ****************************************************************
     */
+
+///
+/// ---------------------------------------
+/// DISCLAIMER: This code was inspired by a
+/// project by AbleOpus. Source can be found
+/// in this link:
+/// https://github.com/AbleOpus/NetworkingSamples
+/// ---------------------------------------
+/// 
+
 using System;
 using System.Net.Sockets;
 using System.Net;

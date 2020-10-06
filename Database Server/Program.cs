@@ -16,6 +16,16 @@
     *                       Many clients can use this server at the same time.
     *                       ****************************************************************
     */
+
+///
+/// ---------------------------------------
+/// DISCLAIMER: This code was inspired by a
+/// project by AbleOpus. Source can be found
+/// in this link:
+/// https://github.com/AbleOpus/NetworkingSamples
+/// ---------------------------------------
+/// 
+
 using System;
 using System.Collections.Generic;
 using System.Text;
