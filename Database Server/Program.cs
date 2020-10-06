@@ -123,9 +123,19 @@ namespace Database_Server
             commandPiece = commandLine.Split(' ');          // splits the command sent into the array[]
 
 
-            string filePath = @"..\..\database.txt";   // creates 
-            List<string> lineList = new List<string>();
-            lineList = File.ReadAllLines(filePath).ToList();
+            string filePath = @"..\..\database.txt";            // creates the file path for the fileIO to work with
+            List<string> lineList = new List<string>();         // this will store all lines of the text file
+
+            try
+            {
+                lineList = File.ReadAllLines(filePath).ToList();    // store all lines in the list
+            }
+            catch (System.IO.FileNotFoundException)
+            {
+                StreamWriter sq = File.CreateText(filePath);
+                sq.Close();
+            }
+
 
 
             switch (commandPiece[0].ToLower())
@@ -133,7 +143,7 @@ namespace Database_Server
                 case "insert":
                     Console.WriteLine("Insert command received");
 
-                    if (!DateValidation(commandPiece[3]))
+                    if (!DateValidation(commandPiece[3]))       // in case the date is not valid, sends the response to the 
                     {
                         Console.WriteLine("Invalid date format.");
                         response = Encoding.ASCII.GetBytes("Please check your date format. Type the query again.\nPlease try again.");
