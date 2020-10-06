@@ -173,14 +173,14 @@ namespace Database_Server
                 case "update":
                     Console.WriteLine("Update command received");
 
-                    if (commandPiece.Count() < 5)
+                    if (commandPiece.Count() < 5)               // checks for arguments validation
                     {
                         Console.WriteLine("Not enough arguments provided.");
                         response = Encoding.ASCII.GetBytes("Please check your command. Type the query again.");
                         currentSocket.Send(response);
                         break;
                     }
-                    if (!DateValidation(commandPiece[4]))
+                    if (!DateValidation(commandPiece[4]))       // checks if the date is valid
                     {
                         Console.WriteLine("Invalid date format.");
                         response = Encoding.ASCII.GetBytes("Please check your date format. Type the query again.");
@@ -192,15 +192,16 @@ namespace Database_Server
 
                     try
                     {
-                        lineList[lineID] = commandPiece[1] + "," + commandPiece[2] + "," + commandPiece[3] + "," + commandPiece[4];
-                        File.WriteAllLines(filePath, lineList);
-                        response = Encoding.ASCII.GetBytes("Updated successfully.");
-                        currentSocket.Send(response);
+                        lineList[lineID] = commandPiece[1] + "," + commandPiece[2] + "," + commandPiece[3] + "," + commandPiece[4]; // replaces the line chosen with the updated info
+                        File.WriteAllLines(filePath, lineList);                                                                     // writes everything to file
+                        response = Encoding.ASCII.GetBytes("Updated successfully.");                                                // creates response object
+                        currentSocket.Send(response);                                                                               // sends it
                         break;
 
                     }
                     catch (System.ArgumentOutOfRangeException)
                     {
+                        Console.WriteLine("Inexistent ID.");
                         response = Encoding.ASCII.GetBytes("No such ID exists.");
                         currentSocket.Send(response);
                         break;
@@ -210,7 +211,7 @@ namespace Database_Server
                 case "find":
                     Console.WriteLine("Find command received");
 
-                    if (commandPiece.Count() < 2)
+                    if (commandPiece.Count() < 2)       // checks if commands are valid
                     {
                         Console.WriteLine("Not enough arguments provided.");
                         response = Encoding.ASCII.GetBytes("Please check your command. Type the query again.");
@@ -218,17 +219,16 @@ namespace Database_Server
                         break;
                     }
 
-                    lineID = Int32.Parse(commandPiece[1]);
+                    lineID = Int32.Parse(commandPiece[1]);      // gets int from string as ID
 
                     try
                     {
-                        string[] returned = lineList[lineID].Split(',');
-                        response = Encoding.ASCII.GetBytes("ID " + returned[0] + ": " + " " + returned[1] + " " + returned[2] + " " + returned[3]);
+                        string[] resultPiece = lineList[lineID].Split(',');
+                        response = Encoding.ASCII.GetBytes("ID " + resultPiece[0] + ": " + " " + resultPiece[1] + " " + resultPiece[2] + " " + resultPiece[3]);
                         currentSocket.Send(response);
                         break;
-
                     }
-                    catch (System.ArgumentOutOfRangeException)
+                    catch (System.ArgumentOutOfRangeException)      // ID was out of range
                     {
                         response = Encoding.ASCII.GetBytes("No such ID exists.");
                         currentSocket.Send(response);
@@ -237,18 +237,26 @@ namespace Database_Server
 
 
                 case "quit":
-                    currentSocket.Shutdown(SocketShutdown.Both);
-                    currentSocket.Close();
-                    clientSideSockets.Remove(currentSocket);
+                    currentSocket.Shutdown(SocketShutdown.Both);            // shuts down the socket
+                    currentSocket.Close();                                  // closes it
+                    clientSideSockets.Remove(currentSocket);                // removes it from the socket list
                     Console.WriteLine("Client requested to disconnect.");
                     break;
 
                 case "help":
-                    response = Encoding.ASCII.GetBytes("Write your command (insert, update or find) followed by first name, last name and date of birth (DD/MM/YYYY).\n" +
-                                                        "Please separate each operation with a single space. Type 'quit' to quit the program.\n" +
-                                                        "E.g.: To insert an entry:\"insert John Doe 22/01/1956\"\n" +
-                                                        "to update an entry insert the ID before the name: \"update 34 John Doe 22/01/1966\"");
-                    currentSocket.Send(response);
+                    Console.WriteLine("Help text was sent.");
+                    response = Encoding.ASCII.GetBytes("\nYou have three operations available.\n" +
+                        "These are: insert, find and update.\n\n" +
+                        "The insert function includes a new name into the database and generates a unique ID for it.\n" +
+                        "To use insert, you should include a first name, a last name and a date of birth after the command, all separated by single spaces.\n" +
+                        "\"insert Noman Atique 20/12/1985\"\n\n" +
+                        "The find function searches for a specific ID and returns the contents of it.\n" +
+                        "To use find, you should include an ID number.\n\n" +
+                        "\"find 7\"\n\n" +
+                        "The update function changes the contents of the entry.\n" +
+                        "To use update, you should include an ID number, followed by a first name, a last name and a date of birth.\n" +
+                        "\"update 3 Noman Atique 20/12/1984\"\n");
+                currentSocket.Send(response);
                     break;
 
                 default:
@@ -259,10 +267,6 @@ namespace Database_Server
                     break;
             }
             
-
-
-
-
             try
             {
                 currentSocket.BeginReceive(buffer, 0, BUFFER_SIZE, SocketFlags.None, ReceiveCallback, currentSocket);
@@ -271,14 +275,13 @@ namespace Database_Server
             {
                 // I don't really know WHY this happens, but when I quit from the client it throws an exception.
             }
-
         }
 
         static bool DateValidation(string date)
         {
-            bool val = Regex.IsMatch(date, @"(0[1-9]|[12][0-9]|3[01])/(0[1-9]|1[012])/((19|20)[\d]{2})");
+            bool val = Regex.IsMatch(date, @"(0[1-9]|[12][0-9]|3[01])/(0[1-9]|1[012])/((19|20)[\d]{2})"); // validates to format DD/MM/YYYY
 
-            return val;            
+            return val;
         }
     }
 }
