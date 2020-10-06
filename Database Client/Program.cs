@@ -3,7 +3,7 @@ using System.Net.Sockets;
 using System.Net;
 using System.Text;
 
-namespace MultiClient
+namespace Database_Client
 {
     class Program
     {

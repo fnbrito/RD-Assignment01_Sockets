@@ -15,7 +15,7 @@ using System.Net.Sockets;
 using System.IO;
 using System.Linq;
 
-namespace MultiServer
+namespace Database_Server
 {
     class Program
     {
