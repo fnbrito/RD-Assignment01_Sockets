@@ -65,7 +65,7 @@ namespace Database_Client
         private static void MainLoop()
         {
             // First info prompt
-            Console.WriteLine(@"Write your command (insert, update or find) followed by first name, last name and date of birth (DD/MM/YYYY).\n" +
+            Console.WriteLine("\n\nWrite your command (insert, update or find) followed by first name, last name and date of birth (DD/MM/YYYY).\n" +
                 "Please separate each operation with a single space. Type 'quit' to quit the program.\n" +
                 "E.g.: To insert an entry:\"insert John Doe 22/01/1956\"\n" +
                 "to update an entry insert the ID before the name: \"update 34 John Doe 22/01/1966\"");
